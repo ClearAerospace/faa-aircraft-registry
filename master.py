@@ -35,8 +35,8 @@ STATUS_CODES = {
     'N': 'Non-citizen Corporations which have not returned their flight hour reports',
     'R': 'Registration pending',
     'S': 'Second Triennial Aircraft Registration Form has been mailed and has not been returned by the Post Office',
-    'T': 'Valid Registration from a Trainee ',
-    'V': 'ValidRegistration',
+    'T': 'Valid Registration from a Trainee',
+    'V': 'Valid Registration',
     'W': 'Certificate of Registration has been deemed Ineffective or Invalid',
     'X': 'Enforcement Letter',
     'Z': 'Permanent Reserved',
@@ -89,6 +89,15 @@ def convert_date(datestr):
     return None
 
 
+def get_other_names(row):
+    others = []
+    for key in row.keys():
+        if 'OTHER' in key:
+            if row[key].strip():
+                others.append(row[key].strip())
+    return others
+
+
 def read(csvfile):
     """
     This function will read the MASTER.txt csv file passed as a handle and return a list of registrations.
@@ -99,6 +108,7 @@ def read(csvfile):
     reader = csv.DictReader(csvfile)
     for row in reader:
         pk = row.get('UNIQUE ID', '')
+
         registrant = {
             'type': REGISTRANT_TYPE.get(row.get('TYPE REGISTRANT', ''), ''),
             'name': row.get('NAME', '').strip(),
@@ -129,14 +139,14 @@ def read(csvfile):
             'last_action_date': convert_date(row.get('LAST ACTION DATE', None)),
             'certificate_issue_date': convert_date(row.get('CERT ISSUE DATE', None)),
             'certification': certification,
-            'aircraft_type': AIRCRAFT_TYPES.get(row.get('TYPE AIRCRAFT', ''), None),
-            'engine_type': ENGINE_TYPES.get(row.get('TYPE ENGINE', '9'), None),
-            'status': STATUS_CODES.get(row.get('STATUS CODE', ''), ''),
+            'aircraft_type': AIRCRAFT_TYPES.get(row.get('TYPE AIRCRAFT', '').strip(), None),
+            'engine_type': ENGINE_TYPES.get(row.get('TYPE ENGINE', '9').strip(), None),
+            'status': STATUS_CODES.get(row.get('STATUS CODE', '').strip(), ''),
             'transponder_code': row.get('MODE S CODE', None),
             'transponder_code_hex': row.get('MODE S CODE HEX', None),
-            'fractional_ownership': False,
-            'airworthiness_date': convert_date(row.get('AIRWORTHINESS DATE', None)),
-            'other_names': [],
+            'fractional_ownership': True if row.get('FRACT OWNERSHIP', '').strip().upper() == 'Y' else False,
+            'airworthiness_date': convert_date(row.get('AIR WORTH DATE', None)),
+            'other_names': get_other_names(row),
             'expiration_date': convert_date(row.get('EXPIRATION DATE', None)),
             'id': pk,
             'kit': kit,
