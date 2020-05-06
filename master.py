@@ -106,7 +106,7 @@ def read(csvfile):
             'street_2': row.get('STREET 2', '').strip(),
             'city': row.get('CITY', '').strip(),
             'state': row.get('STATE', '').strip(),
-            'zip_code': get_zip_code(row.get('ZIP CODE', '')),
+            'zip_code': get_zip_code(row.get('ZIP CODE', '').strip()),
             'region': REGISTRANT_REGIONS.get(row.get('REGION', ''), ''),
             'county': row.get('COUNTY', '').strip(),
             'country': row.get('COUNTRY', '').strip(),
