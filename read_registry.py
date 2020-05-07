@@ -3,13 +3,6 @@ from aircraft import read as read_aircraft
 from engines import read as read_engines
 from master import read as read_master
 
-url = 'http://registry.faa.gov/database/ReleasableAircraft.zip'
-
-# r = requests.get(url, stream=True)
-# if r.ok:
-#     with zipfile.ZipFile(io.BytesIO(r.content)) as z:
-#         registrations = read(z)
-
 
 def read(zipped_file):
     """
