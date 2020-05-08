@@ -12,12 +12,17 @@ The downloaded data is read from multiple comma-delimited files contained within
   - `ENGINE.txt`: engine reference file
   - `MASTER.txt`: aircraft registration master file
 
+## Installation
+```
+pip install faa_aircraft_registry
+```
+
 ## Example Usage
 ```python
 import io
 import zipfile
 import requests
-from read_registry import read
+from faa_aircraft_registry import read
 
 url = 'http://registry.faa.gov/database/ReleasableAircraft.zip'
 r = requests.get(url, stream=True)
