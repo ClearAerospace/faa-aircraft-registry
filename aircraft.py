@@ -55,8 +55,8 @@ def read(csvfile):
             'certification': CERTIFICATION_CODES.get(row.get('BUILD-CERT-IND', ''), ''),
             'number_of_engines': int(row.get('NO-ENG', None)),
             'number_of_seats': int(row.get('NO-SEATS', None)),
-            'weight': AIRCRAFT_WEIGHTS.get(row.get('AC-WEIGHT', '').strip('CLASS '), ''),
-            'cruising_speed': int(row.get('SPEED', None))
+            'weight_lbs': AIRCRAFT_WEIGHTS.get(row.get('AC-WEIGHT', '').strip('CLASS '), ''),
+            'cruising_speed_mph': int(row.get('SPEED', None))
         }
 
         aircraft[code] = entry
