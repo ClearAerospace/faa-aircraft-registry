@@ -32,7 +32,7 @@ def read(csvfile):
             'model': row.get('MODEL', '').strip(),
             'type': ENGINE_TYPES.get(row.get('TYPE', '9').strip(), ''),
             'power_hp': int(row.get('HORSEPOWER', '0')),
-            'thrust_lbs': int(row.get('THRUST', '0'))
+            'thrust_lbf': int(row.get('THRUST', '0'))
         }
         engines[code] = engine
 
