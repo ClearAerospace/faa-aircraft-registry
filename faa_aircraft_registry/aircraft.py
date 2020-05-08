@@ -1,5 +1,5 @@
 import csv
-from engines import ENGINE_TYPES
+from .engines import ENGINE_TYPES
 
 AIRCRAFT_TYPES = {
     '1': 'Glider',

@@ -1,7 +1,7 @@
 import io
-from aircraft import read as read_aircraft
-from engines import read as read_engines
-from master import read as read_master
+from .aircraft import read as read_aircraft
+from .engines import read as read_engines
+from .master import read as read_master
 
 
 def read(zipped_file):

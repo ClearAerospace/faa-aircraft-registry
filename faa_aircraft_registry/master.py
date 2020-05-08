@@ -1,7 +1,7 @@
 import csv
 from datetime import datetime
-from aircraft import AIRCRAFT_TYPES
-from engines import ENGINE_TYPES
+from .aircraft import AIRCRAFT_TYPES
+from .engines import ENGINE_TYPES
 
 REGISTRANT_TYPE = {
     '1': 'Individual',
