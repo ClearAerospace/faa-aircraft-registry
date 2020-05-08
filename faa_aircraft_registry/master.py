@@ -134,7 +134,7 @@ def read(csvfile):
             'serial_number': row.get('SERIAL NUMBER', '').strip(),
             'aircraft_manufacturer_code': row.get('MFR MDL CODE', '').strip(),
             'engine_manufacturer_code': row.get('ENG MFR MDL', '').strip(),
-            'manufacturing_year': row.get('YEAR MFR', None),
+            'manufacturing_year': row.get('YEAR MFR', None).strip(),
             'registrant': registrant,
             'last_action_date': convert_date(row.get('LAST ACTION DATE', None)),
             'certificate_issue_date': convert_date(row.get('CERT ISSUE DATE', None)),
