@@ -125,10 +125,6 @@ def read(csvfile):
             'class': None,
             'operations': None,
         }
-        kit = {
-            'manufacturer': row.get('KIT MFR', '').strip(),
-            'model': row.get('KIT MODEL', '').strip(),
-        }
         record = {
             'registration_number': 'N' + row.get('N-NUMBER', '').strip(),
             'serial_number': row.get('SERIAL NUMBER', '').strip(),
@@ -149,7 +145,8 @@ def read(csvfile):
             'other_names': get_other_names(row),
             'expiration_date': convert_date(row.get('EXPIRATION DATE', None)),
             'id': pk,
-            'kit': kit,
+            'kit_manufacturer': row.get('KIT MFR', '').strip(),
+            'kit_model': row.get('KIT MODEL', '').strip(),
         }
 
         registrations[pk] = record
