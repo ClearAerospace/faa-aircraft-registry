@@ -50,7 +50,7 @@ def read(csvfile):
             'manufacturer': row.get('MFR', '').strip(),
             'model': row.get('MODEL', '').strip(),
             'type': AIRCRAFT_TYPES.get(row.get('TYPE-ACFT', ''), ''),
-            'engine_type': ENGINE_TYPES.get(row.get('TYPE-ENG', '9'), ''),
+            'engine_type': ENGINE_TYPES.get(row.get('TYPE-ENG', '9').strip(), ''),
             'category': AIRCRAFT_CATEGORIES.get(row.get('AC-CAT', ''), ''),
             'certification': CERTIFICATION_CODES.get(row.get('BUILD-CERT-IND', ''), ''),
             'number_of_engines': int(row.get('NO-ENG', None)),
