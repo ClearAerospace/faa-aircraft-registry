@@ -144,7 +144,7 @@ def read(csvfile):
             'airworthiness_date': convert_date(row.get('AIR WORTH DATE', None)),
             'other_names': get_other_names(row),
             'expiration_date': convert_date(row.get('EXPIRATION DATE', None)),
-            'id': pk,
+            'unique_regulatory_id': pk,
             'kit_manufacturer': row.get('KIT MFR', '').strip(),
             'kit_model': row.get('KIT MODEL', '').strip(),
         }
