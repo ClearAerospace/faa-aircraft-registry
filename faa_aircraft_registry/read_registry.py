@@ -1,12 +1,13 @@
 import io
-from .aircraft import read as read_aircraft
-from .engines import read as read_engines
-from .master import read as read_master
+
+from faa_aircraft_registry.aircraft import read as read_aircraft
+from faa_aircraft_registry.engines import read as read_engines
+from faa_aircraft_registry.master import read as read_master
 
 
 def read(zipped_file):
     """
-    Documentation
+    This function reads a zipped folder and parses aircraft, engine, and registration data from their respective files.
     """
 
     registrations = {}
@@ -14,33 +15,34 @@ def read(zipped_file):
     # Read ACFTREF.txt csv file
     with zipped_file.open('ACFTREF.txt', 'r') as f:
         csvfile = io.TextIOWrapper(f, 'utf-8-sig')
-        registrations['aircraft'] = read_aircraft(csvfile)
+        aircraft = read_aircraft(csvfile)
 
     # Read ENGINE.txt csv file
     with zipped_file.open('ENGINE.txt', 'r') as f:
         csvfile = io.TextIOWrapper(f, 'utf-8-sig')
-        registrations['engines'] = read_engines(csvfile)
+        engines = read_engines(csvfile)
 
     # Read MASTER.txt csv file
     with zipped_file.open('MASTER.txt', 'r') as f:
         csvfile = io.TextIOWrapper(f, 'utf-8-sig')
-        registrations['master'] = read_master(csvfile)
+        records = read_master(csvfile)
 
-    for pk, registration in registrations['master'].items():
+    for _pk, record in records.items():
+        # Add source
+        record['source'] = 'FAA'
+
         # Find engine from engine code in master list
-        engine_code = registration.get('engine_manufacturer_code', None)
-        if engine_code and engine_code in registrations['engines']:
-            registration['engine_details'] = registrations['engines'].get(
-                engine_code)
-        else:
-            registration['engine_details'] = {}
+        engine_code = record.get('engine_manufacturer_code')
+        record['engine'] = engines.get(engine_code)
 
         # Find airframe from airframe code in master list
-        aircraft_code = registration.get('aircraft_manufacturer_code', None)
-        if aircraft_code and aircraft_code in registrations['aircraft']:
-            registration['aircraft_details'] = registrations['aircraft'].get(
-                aircraft_code)
-        else:
-            registration['aircraft_details'] = {}
+        aircraft_code = record.get('aircraft_manufacturer_code')
+        record['aircraft'] = aircraft.get(aircraft_code)
+
+    registrations = {
+        'aircraft': aircraft,
+        'engines': engines,
+        'master': records,
+    }
 
     return registrations

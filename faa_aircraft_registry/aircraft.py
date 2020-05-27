@@ -1,38 +1,11 @@
 import csv
-from .engines import ENGINE_TYPES
 
-AIRCRAFT_TYPES = {
-    '1': 'Glider',
-    '2': 'Balloon',
-    '3': 'Blimp/Dirigible',
-    '4': 'Fixed wing single engine',
-    '5': 'Fixed wing multi engine',
-    '6': 'Rotorcraft',
-    '7': 'Weight-shift-control',
-    '8': 'Powered Parachute',
-    '9': 'Gyroplane',
-    'H': 'Hybrid Lift',
-    'O': 'Other'
-}
+from faa_aircraft_registry.types import AircraftDictType
+from faa_aircraft_registry.utils import transform
 
-AIRCRAFT_CATEGORIES = {
-    '1': 'Land',
-    '2': 'Sea',
-    '3': 'Amphibian'
-}
-
-CERTIFICATION_CODES = {
-    '0': 'Type Certificated',
-    '1': 'Not Type Certificated',
-    '2': 'Light Sport'
-}
-
-AIRCRAFT_WEIGHTS = {
-    '1': 'Up to 12,499',
-    '2': '12,500 - 19,999',
-    '3': '20,000 and over.',
-    '4': 'UAV up to 55'
-}
+fieldnames = ['code', 'manufacturer', 'model',
+              'type', 'engine_type', 'category', 'certification', 'number_of_engines',
+              'number_of_seats', 'weight_category', 'cruising_speed_mph']
 
 
 def read(csvfile):
@@ -40,25 +13,23 @@ def read(csvfile):
     This function will read the ACFTREF.txt csv file as a handle and return a list of aircraft models.
     """
 
-    aircraft = {}
+    # Initialize output dictionary
+    all_aircraft = {}
 
-    reader = csv.DictReader(csvfile)
+    # Create the CSV file reader
+    reader = csv.DictReader(csvfile, fieldnames=fieldnames,
+                            restkey='extra', restval=None)
+
+    # Skip the header row
+    next(reader, None)
+
+    # Loop through rows and create dictionary
     for row in reader:
-        code = row.get('CODE', None).strip()
-        entry = {
-            'code': code,
-            'manufacturer': row.get('MFR', '').strip(),
-            'model': row.get('MODEL', '').strip(),
-            'type': AIRCRAFT_TYPES.get(row.get('TYPE-ACFT', ''), ''),
-            'engine_type': ENGINE_TYPES.get(row.get('TYPE-ENG', '9').strip(), ''),
-            'category': AIRCRAFT_CATEGORIES.get(row.get('AC-CAT', ''), ''),
-            'certification': CERTIFICATION_CODES.get(row.get('BUILD-CERT-IND', ''), ''),
-            'number_of_engines': int(row.get('NO-ENG', None)),
-            'number_of_seats': int(row.get('NO-SEATS', None)),
-            'weight_category': AIRCRAFT_WEIGHTS.get(row.get('AC-WEIGHT', '').strip('CLASS '), ''),
-            'cruising_speed_mph': int(row.get('SPEED', None))
-        }
 
-        aircraft[code] = entry
+        # Transform row values into aircraft dictionary
+        aircraft = transform(row, AircraftDictType)
 
-    return aircraft
+        # Save aircraft to output dictionary by FAA code as key
+        all_aircraft[aircraft['code']] = aircraft
+
+    return all_aircraft
