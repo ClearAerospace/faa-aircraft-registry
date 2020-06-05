@@ -188,7 +188,7 @@ class DateType(Text):
 class RegistrantTypeType(Text):
 
     def __new__(self, registrant_type: Text) -> Text:
-        return REGISTRANT_TYPE.get(registrant_type.strip(), None)
+        return REGISTRANT_TYPE.get(registrant_type.strip(), '')
 
 
 class RegistrantRegionType(Text):
