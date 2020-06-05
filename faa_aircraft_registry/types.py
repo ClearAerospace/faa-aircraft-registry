@@ -178,11 +178,11 @@ class ZipCode(Text):
 
 class DateType(Text):
 
-    def __new__(self, datestr: Text) -> Text:
+    def __new__(self, datestr: Text) -> Optional[Text]:
         try:
             return datetime.strptime(datestr.strip(), '%Y%m%d').strftime('%Y-%m-%d')
         except ValueError:
-            return ''
+            return None
 
 
 class RegistrantTypeType(Text):
