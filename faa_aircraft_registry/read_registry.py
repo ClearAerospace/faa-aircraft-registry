@@ -32,11 +32,11 @@ def read(zipped_file):
         record['source'] = 'FAA'
 
         # Find engine from engine code in master list
-        engine_code = record.get('engine_manufacturer_code')
+        engine_code = record.pop('engine_manufacturer_code')
         record['engine'] = engines.get(engine_code)
 
         # Find airframe from airframe code in master list
-        aircraft_code = record.get('aircraft_manufacturer_code')
+        aircraft_code = record.pop('aircraft_manufacturer_code')
         record['aircraft'] = aircraft.get(aircraft_code)
 
     registrations = {
