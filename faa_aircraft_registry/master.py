@@ -1,5 +1,7 @@
 import csv
 
+from typing import Optional
+
 from faa_aircraft_registry.utils import transform
 from faa_aircraft_registry.types import RecordDictType, RegistrantDictType
 
@@ -14,7 +16,7 @@ fieldnames = ['registration_number', 'serial_number', 'aircraft_manufacturer_cod
               ]
 
 
-def read(csvfile):
+def read(csvfile, aircraft: Optional[dict] = None, engines: Optional[dict] = None) -> dict:
     """
     This function will read the MASTER.txt csv file passed as a handle and return a list of registrations.
     """
@@ -33,14 +35,10 @@ def read(csvfile):
     for row in reader:
 
         # Concatenate other names
-        others = {}
         other_names = []
-        for key, value in row.items():
+        for key in set(row.keys()):
             if 'OTHER NAMES' in key:
-                others[key] = value
-        for key, value in others.items():
-            del row[key]
-            other_names.append(value.strip())
+                other_names.append(row.pop(key).strip())
         row['other_names'] = ', '.join(filter(None, other_names))
 
         # Transform row values into record dictionary
@@ -52,6 +50,19 @@ def read(csvfile):
                                'type': RegistrantDictType
                            }]
                            )
+
+        # Set source to FAA
+        record['source'] = 'FAA'
+
+        # Set aircraft from mfg code only if all aircraft are provided
+        if aircraft and record['aircraft_manufacturer_code']:
+            aircraft_code = record.pop('aircraft_manufacturer_code')
+            record['aircraft'] = aircraft.get(aircraft_code)
+
+        # Set engine from mfg code only if all engines are provided
+        if engines and record['engine_manufacturer_code']:
+            engine_code = record.pop('engine_manufacturer_code')
+            record['engine'] = engines.get(engine_code)
 
         # Save engine to output dictionary by unique ID as key
         registrations[record['unique_regulatory_id']] = record
