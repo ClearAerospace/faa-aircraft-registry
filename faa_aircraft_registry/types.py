@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime
 from typing import List, Optional, Text, TypedDict
+from .utils import parse_certification_codes
 
 AIRCRAFT_TYPES = {
     '1': 'Glider',
@@ -212,10 +213,7 @@ class StatusType(Text):
 class CertificationType(Text):
 
     def __new__(self, certification: Text) -> Optional[dict]:
-        return {
-            'classification': '',
-            'operations': '',
-        }
+        return parse_certification_codes(certification)
 
 
 class FractionalOwnershipType(Text):
