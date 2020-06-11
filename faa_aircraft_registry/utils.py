@@ -122,23 +122,30 @@ def parse_certification_codes(certification: Text) -> Optional[dict]:
 
     if not classification:
         return None
-    else:
-        output['classification'] = classification
 
     if classification == 'Multiple':
         index = 3
-        output['subclassifications'] = [
-            cert['subclassifications'].get(code) for code in value[1:3]]
+        subclassifications = [
+            cert['subclassifications'].get(code)
+            for code in value[1:3]
+        ]
     else:
         index = 1
+        subclassifications = None
 
-    if len(value) > index:
-        if 'operations' in cert:
-            operations = cert.get('operations').keys()
-            output['operations'] = [cert['operations'].get(
-                key) for key in operations if key in value[index:]]
+    if len(value) > index and 'operations' in cert:
+        operations = [
+            cert['operations'].get(key)
+            for key in set(cert.get('operations').keys()) if key in value[index:]
+        ]
+    else:
+        operations = None
 
-    return output
+    return {
+        'classification': classification,
+        'subclassifications': subclassifications,
+        'operations': operations
+    }
 
 
 def transform(dict_: dict, typed_dict: dict, substring_to_type: Optional[List] = None) -> dict:

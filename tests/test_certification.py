@@ -14,13 +14,21 @@ class CertificationCodeTests(unittest.TestCase):
     def test_only_classification(self):
         self.assertDictEqual(
             parse_certification_codes('1'),
-            {'classification': 'Standard'}
+            {
+                'classification': 'Standard',
+                'subclassifications': None,
+                'operations': None
+            }
         )
 
     def test_standard_normal(self):
         self.assertDictEqual(
             parse_certification_codes('1N'),
-            {'classification': 'Standard', 'operations': ['Normal', ]}
+            {
+                'classification': 'Standard',
+                'subclassifications': None,
+                'operations': ['Normal', ]
+            }
         )
 
     def test_multiple(self):
@@ -38,6 +46,7 @@ class CertificationCodeTests(unittest.TestCase):
             parse_certification_codes('49A'),
             {
                 'classification': 'Experimental',
+                'subclassifications': None,
                 'operations': ['Unmanned Aircraft - Research and Development']
             }
         )
