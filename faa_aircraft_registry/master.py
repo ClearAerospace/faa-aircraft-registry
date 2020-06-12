@@ -55,14 +55,14 @@ def read(csvfile, aircraft: Optional[dict] = None, engines: Optional[dict] = Non
         record['source'] = 'FAA'
 
         # Set aircraft from mfg code only if all aircraft are provided
-        if aircraft and record['aircraft_manufacturer_code']:
-            aircraft_code = record.pop('aircraft_manufacturer_code')
-            record['aircraft'] = aircraft.get(aircraft_code)
+        if aircraft:
+            aircraft_code = record.pop('aircraft_manufacturer_code', None)
+            record['aircraft'] = aircraft.get(aircraft_code, None)
 
         # Set engine from mfg code only if all engines are provided
-        if engines and record['engine_manufacturer_code']:
-            engine_code = record.pop('engine_manufacturer_code')
-            record['engine'] = engines.get(engine_code)
+        if engines:
+            engine_code = record.pop('engine_manufacturer_code', None)
+            record['engine'] = engines.get(engine_code, None)
 
         # Save engine to output dictionary by unique ID as key
         registrations[record['unique_regulatory_id']] = record
