@@ -115,8 +115,6 @@ def parse_certification_codes(certification: Text) -> Optional[dict]:
     if not value:
         return None
 
-    output = dict()
-
     cert = CERTIFICATION_AND_OPERATION_CODES.get(value[0], {})
     classification = cert.get('classification')
 
