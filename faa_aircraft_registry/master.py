@@ -38,8 +38,10 @@ def read(csvfile, aircraft: Optional[dict] = None, engines: Optional[dict] = Non
         other_names = []
         for key in set(row.keys()):
             if 'OTHER NAMES' in key:
-                other_names.append(row.pop(key).strip())
-        row['other_names'] = ', '.join(filter(None, other_names))
+                value = row.pop(key).strip()
+                if value:
+                    other_names.append(value)
+        row['other_names'] = other_names or None
 
         # Transform row values into record dictionary
         record = transform(row,
@@ -68,3 +70,9 @@ def read(csvfile, aircraft: Optional[dict] = None, engines: Optional[dict] = Non
         registrations[record['unique_regulatory_id']] = record
 
     return registrations
+
+
+if __name__ == "__main__":
+    with open('MASTER.txt', encoding='utf-8-sig') as f:
+        records = read(f)
+    print(len(records.keys()))

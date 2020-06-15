@@ -128,6 +128,12 @@ class StrippedText(Text):
         return value if value else ''
 
 
+class ListOrNone():
+
+    def __new__(self, value: List) -> Optional[List]:
+        return value or None
+
+
 class AircraftType(Text):
 
     def __new__(self, type_: Text) -> Text:
@@ -285,7 +291,7 @@ class RecordDictType(TypedDict):
     transponder_code_hex: StrippedText
     fractional_ownership: FractionalOwnershipType
     airworthiness_date: DateType
-    other_names: StrippedText
+    other_names: ListOrNone
     expiration_date: DateType
     unique_regulatory_id: StrippedText
     kit_manufacturer: StrippedText
