@@ -70,9 +70,3 @@ def read(csvfile, aircraft: Optional[dict] = None, engines: Optional[dict] = Non
         registrations[record['unique_regulatory_id']] = record
 
     return registrations
-
-
-if __name__ == "__main__":
-    with open('MASTER.txt', encoding='utf-8-sig') as f:
-        records = read(f)
-    print(len(records.keys()))
