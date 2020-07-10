@@ -24,9 +24,7 @@ import zipfile
 import requests
 from faa_aircraft_registry import read
 
-url = 'http://registry.faa.gov/database/ReleasableAircraft.zip'
-r = requests.get(url, stream=True)
-if r.ok:
-    with zipfile.ZipFile(io.BytesIO(r.content)) as z:
-        registrations = read(z)
+registry_zipped_file = 'ReleasableAircraft.zip'
+with zipfile.ZipFile(registry_zipped_file) as z:
+    registrations = read(z)
 ```
