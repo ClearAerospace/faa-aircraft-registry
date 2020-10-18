@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field, InitVar
 from datetime import datetime
 from typing import List, Optional, Text, TypedDict
 from .utils import parse_certification_codes
@@ -296,3 +296,42 @@ class RecordDictType(TypedDict):
     unique_regulatory_id: StrippedText
     kit_manufacturer: StrippedText
     kit_model: StrippedText
+
+
+@dataclass
+class Record:
+    registration_number: str = field(init=False)
+    serial_number: Optional[str] = field(init=False)
+    aircraft_manufacturer_code: Optional[str] = field(init=False)
+    engine_manufacturer_code: Optional[str] = field(init=False)
+    manufacturing_year: Optional[int] = field(init=False)
+    registrant: RegistrantDictType = field(init=False)
+    last_action_date: Optional[datetime] = field(init=False)
+    certificate_issue_date: Optional[datetime] = field(init=False)
+    certification: Optional[dict] = field(init=False)
+    aircraft_type: Optional[str] = field(init=False)
+    engine_type: Optional[str] = field(init=False)
+    status: Optional[str] = field(init=False)
+    transponder_code: Optional[str] = field(init=False)
+    transponder_code_hex: Optional[str] = field(init=False)
+    fractional_ownership: bool = field(init=False)
+    airworthiness_date: Optional[datetime] = field(init=False)
+    other_names: List[str] = field(init=False)
+    expiration_date: Optional[datetime] = field(init=False)
+    unique_regulatory_id: str = field(init=False)
+    kit_manufacturer: Optional[str] = field(init=False)
+    kit_model: Optional[str] = field(init=False)
+    row: InitVar(dict) = None
+
+    def __post_init__(self, row):
+        self.other_names = self._get_other_names(row)
+
+    @staticmethod
+    def _get_other_names(row: dict) -> List[str]:
+        _other_names = []
+        for key in set(row.keys()):
+            if 'OTHER NAMES' in key:
+                value = row.pop(key).strip()
+                if value:
+                    _other_names.append(value)
+        return _other_names
