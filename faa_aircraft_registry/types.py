@@ -1,6 +1,6 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field, InitVar
 from datetime import datetime
-from typing import List, Optional, Text, TypedDict
+from typing import List, Optional, Text, TypedDict, NoReturn, Union
 from .utils import parse_certification_codes
 
 AIRCRAFT_TYPES = {
@@ -222,6 +222,20 @@ class CertificationType(Text):
         return parse_certification_codes(certification)
 
 
+@dataclass
+class Certification:
+    classification: str = field(init=False)
+    subclassifications: Union[List[str], str, None] = field(init=False)
+    operations: Union[List[str], str, None] = field(init=False)
+    certification: InitVar[str] = None
+
+    def __post_init__(self, certification) -> NoReturn:
+        cert_dict = parse_certification_codes(certification)
+        self.classification = cert_dict.get('classification')
+        self.subclassifications = cert_dict.get('subclassifications')
+        self.operations = cert_dict.get('operations')
+
+
 class FractionalOwnershipType(Text):
 
     def __new__(self, ownership: Text) -> bool:
@@ -273,6 +287,20 @@ class RegistrantDictType(TypedDict):
 
 
 @dataclass
+class Registrant:
+    type: RegistrantTypeType
+    name: StrippedText
+    street_1: StrippedText
+    street_2: StrippedText
+    city: StrippedText
+    state: StrippedText
+    zip_code: ZipCode
+    region: RegistrantRegionType
+    county: StrippedText
+    country: StrippedText
+
+
+@dataclass
 class RecordDictType(TypedDict):
     """Record dictionary with types."""
     registration_number: RegistrationNumberType
@@ -296,3 +324,77 @@ class RecordDictType(TypedDict):
     unique_regulatory_id: StrippedText
     kit_manufacturer: StrippedText
     kit_model: StrippedText
+
+
+@dataclass
+class Record:
+    registration_number: str = field(init=False)
+    serial_number: Optional[str] = field(init=False)
+    aircraft_manufacturer_code: Optional[str] = field(init=False)
+    engine_manufacturer_code: Optional[str] = field(init=False)
+    manufacturing_year: Optional[int] = field(init=False)
+    registrant: RegistrantDictType = field(init=False)
+    last_action_date: Optional[datetime] = field(init=False)
+    certificate_issue_date: Optional[datetime] = field(init=False)
+    certification: Optional[dict] = field(init=False)
+    aircraft_type: Optional[str] = field(init=False)
+    engine_type: Optional[str] = field(init=False)
+    status: Optional[str] = field(init=False)
+    transponder_code: Optional[str] = field(init=False)
+    transponder_code_hex: Optional[str] = field(init=False)
+    fractional_ownership: bool = field(init=False)
+    airworthiness_date: Optional[datetime] = field(init=False)
+    other_names: List[str] = field(init=False)
+    expiration_date: Optional[datetime] = field(init=False)
+    unique_regulatory_id: str = field(init=False)
+    kit_manufacturer: Optional[str] = field(init=False)
+    kit_model: Optional[str] = field(init=False)
+    row: InitVar(dict) = None
+
+    def __post_init__(self, row) -> NoReturn:
+        self.registration_number = f"N{row.get('registration_number')}"
+        self.serial_number = row.get('serial_number', '')
+        self.aircraft_manufacturer_code = row.get('aircraft_manufacturer_code')
+        self.engine_manufacturer_code = row.get('engine_manufacturer_code')
+        self.manufacturing_year = row.get('manufacturing_year')
+        self.registrant = 'tbd'
+        self.last_action_date = self._to_datetime(row.get('last_action_date'))
+        self.certificate_issue_date = self._to_datetime(
+            row.get('certificate_issue_date'))
+        self.certification = Certification(
+            certification=row.get('certification'))
+        self.aircraft_type = AIRCRAFT_TYPES.get(row.get('aircraft_type', ''))
+        self.engine_type = ENGINE_TYPES.get(row.get('engine_type', ''))
+        self.status = STATUS_CODES.get(row.get('status', ''))
+        self.transponder_code = row.get('transponder_code')
+        self.transponder_code_hex = row.get('transponder_code_hex')
+        self.fractional_ownership = bool(row.get('fractional_ownership'))
+        self.airworthiness_date = self._to_datetime(
+            row.get('airworthiness_date'))
+        self.other_names = self._get_other_names(row)
+        self.expiration_date = self._to_datetime(row.get('expiration_date'))
+        self.unique_regulatory_id = row.get('unique_regulatory_id')
+        self.kit_manufacturer = row.get('kit_manufacturer')
+        self.kit_model = row.get('kit_model')
+
+    @staticmethod
+    def _to_datetime(text_date: str) -> Optional[datetime]:
+        try:
+            try:
+                import pytz
+                central = pytz.timezone('US/Central')
+                return central.localize(datetime.strptime(text_date, '%Y%m%d'))
+            except ImportError:
+                return datetime.strptime(text_date, '%Y%m%d')
+        except ValueError:
+            return None
+
+    @staticmethod
+    def _get_other_names(row: dict) -> List[str]:
+        _other_names = []
+        for key in set(row.keys()):
+            if 'OTHER NAMES' in key:
+                value = row.pop(key).strip()
+                if value:
+                    _other_names.append(value)
+        return _other_names
