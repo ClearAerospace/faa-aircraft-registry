@@ -19,9 +19,7 @@ pip install faa_aircraft_registry
 
 ## Example Usage
 ```python
-import io
 import zipfile
-import requests
 from faa_aircraft_registry import read
 
 registry_zipped_file = 'ReleasableAircraft.zip'
